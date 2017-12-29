@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--引入配置文件-->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="#{propertyConfigurer['jdbc.driver']}"/>
+        <property name="url" value="#{propertyConfigurer['jdbc.url']}"/>
+        <property name="username" value="#{propertyConfigurer['jdbc.username']}"/>
+        <property name="password" value="#{propertyConfigurer['jdbc.password']}"/>
+
+        <property name="initialSize" value="#{propertyConfigurer['initialSize']}"/>
+
+        <property name="maxActive" value="#{propertyConfigurer['maxActive']}"/>
+
+        <property name="maxIdle" value="#{propertyConfigurer['maxIdle']}"/>
+
+        <property name="minIdle" value="#{propertyConfigurer['minIdle']}"/>
+
+        <property name="maxWait" value="#{propertyConfigurer['maxWait']}"/>
+    </bean>
+
+    <!--spring和Mybatis完美结合，不需要mybatis的配置文件-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--自动扫描mapping.xml文件-->
+        <property name="mapperLocations" value="classpath:mapper/db-mapper/*.xml"/>
+        <property name="typeAliasesPackage" value=""/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="module.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="MySpace:war">
+    <output-path>$PROJECT_DIR$/MySpace/target</output-path>
+    <root id="archive" name="MySpace.war">
+      <element id="artifact" artifact-name="MySpace:war exploded" />
+    </root>
+  </artifact>
+</component>
