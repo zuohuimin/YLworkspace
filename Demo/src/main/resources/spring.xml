@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!-- component scan -->
+    <context:component-scan base-package="cn.zhomp.*">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+       <property name="locations">
+        <list>
+        <value>classpath:system/db.properties</value>
+        </list>
+        </property>
+    </bean>
+
+    <!-- dataSource -->
+    <!--<bean id="ds" class="DataSource">-->
+    <bean id="ds" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <property name="initialSize" value="${initialSize}"/>
+
+        <property name="maxActive" value="${maxActive}"/>
+
+        <property name="maxIdle" value="${maxIdle}"/>
+
+        <property name="minIdle" value="${minIdle}"/>
+
+        <property name="maxWait" value="${maxWait}"/>
+    </bean>
+
+    <!-- sqlSessionFactory -->
+    <bean id="ssf" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="ds"/>
+        <property name="mapperLocations" value="classpath:mapping/*Mapper.xml"/>
+        <property name="typeAliasesPackage" value="cn.zhomp.module.dao"/>
+    </bean>
+
+    <!-- dao -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cn.zhomp.module.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="ssf"/>
+    </bean>
+    <!-- tm -->
+    <bean id="tm" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="ds"/>
+    </bean>
+
+    <!-- annotation -->
+    <tx:annotation-driven transaction-manager="tm"/>
+</beans>
